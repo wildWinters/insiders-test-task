@@ -1,0 +1,80 @@
+{
+  "app": {
+    "course": "Course",
+    "garden": "Garden",
+    "tagline": "MINI-COURSES AI CREATOR",
+    "metaDescription": "AI assistant that can create a complete mini-course",
+    "create": "Create new account",
+    "agree": "I agree with ",
+    "terms": "Terms ",
+    "and": "and ",
+    "conditions": "Conditions ",
+    "navigation": [
+      "Create",
+      "Share",
+      "Download",
+      "Courses",
+      "Contact",
+      "Sign In"
+    ],
+    "features": {
+      "miniCourse": "Use our AI-powered tool to create accurate and complete mini-courses in minutes. Add your own unique revisions including questions, images, videos, and customized completions for your specific needs. You can use these courses on our app or website seamlessly.",
+      "createCourseAction": "Create online course"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome 👋",
+      "subtitle": "Sign in to access your account",
+      "fields": [
+        {
+          "name": "email",
+          "label": "Email",
+          "type": "email",
+          "placeholder": "Enter your email"
+        },
+        {
+          "name": "password",
+          "label": "Password",
+          "type": "password",
+          "placeholder": "Enter your password"
+        }
+      ],
+      "options": [
+        {
+          "name": "rememberMe",
+          "label": "Keep me signed in",
+          "type": "checkbox"
+        },
+        {
+          "name": "forgotPassword",
+          "label": "Forgot Password?",
+          "type": "link",
+          "href": "/forgot-password"
+        }
+      ],
+      "buttons": [
+        {
+          "label": "Sign In",
+          "type": "submit",
+          "style": "primary"
+        },
+        {
+          "label": "Sign in with Google",
+          "type": "oauth",
+          "provider": "google",
+          "style": "secondary"
+        }
+      ],
+      "footer": {
+        "notHaveAccount": "Don't have an account?",
+        "haveAccount": "Already have an account?",
+        "link": {
+          "label": "Sign Up",
+          "label2": "Sign In",
+          "href": "/signup"
+        }
+      }
+    }
+  }
+}
