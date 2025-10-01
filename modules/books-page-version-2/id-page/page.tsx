@@ -1,15 +1,37 @@
 "use client";
 
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button } from "@/shared/shad-cn/button";
 import { Card, CardContent } from "@/shared/shad-cn/card";
-import { useRouter } from "next/navigation";
-import { useBookDetail } from "./hook/use-book-detailt";
+import Link from "next/link";
+
+interface Book {
+  id: string;
+  name: string;
+  author: string;
+  description: string;
+}
+
+const allBooks: Book[] = Array.from({ length: 50 }, (_, i) => ({
+  id: (i + 1).toString(),
+  name: `Book ${i + 1}`,
+  author: `Author ${i % 10}`,
+  description: `Опис книги ${i + 1}`,
+}));
 
 export default function BookDetailPage() {
+  const params = useParams();
   const router = useRouter();
-  const { book, loading } = useBookDetail();
+  const [book, setBook] = useState<Book | null>(null);
 
-  if (loading) return <p className="p-6">Завантаження...</p>;
+  useEffect(() => {
+    if (!params?.id) return;
+
+    const found = allBooks.find((b) => b.id === params.id);
+    setBook(found || null);
+  }, [params]);
+
   if (!book) return <p className="p-6">Книга не знайдена</p>;
 
   return (

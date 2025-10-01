@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Input } from "@/shared/shad-cn/input";
 import { Button } from "@/shared/shad-cn/button";
 import { Card, CardContent } from "@/shared/shad-cn/card";
+import { Input } from "@/shared/shad-cn/input";
 import {
   Select,
   SelectContent,
@@ -11,118 +10,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/shad-cn/select";
+import { useBooksList } from "./hook/use-book-list";
+import { useBookExchange } from "./hook/use-book-exchange";
 import { useRouter } from "next/navigation";
-
-interface Book {
-  id: string;
-  name: string;
-  author: string;
-  description: string;
-  ownerId?: string; 
-}
-
-
-const currentUser = {
-  id: "1",
-  name: "Ostap",
-  email: "ostap@example.com",
-};
-
-// Імітація бекенду
-const fetchBooks = async (
-  page = 1,
-  limit = 10,
-  search = "",
-  sort: "asc" | "desc" = "asc"
-): Promise<{ books: Book[]; total: number }> => {
-  const allBooks: Book[] = Array.from({ length: 50 }, (_, i) => ({
-    id: (i + 1).toString(),
-    name: `Book ${i + 1}`,
-    author: `Author ${i % 10}`,
-    description: `Опис книги ${i + 1}`,
-    ownerId: ((i % 5) + 1).toString(), 
-  }));
-
-  let filtered = allBooks.filter(
-    (b) =>
-      b.name.toLowerCase().includes(search.toLowerCase()) ||
-      b.author.toLowerCase().includes(search.toLowerCase())
-  );
-
-  filtered = filtered.sort((a, b) =>
-    sort === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
-  );
-
-  const total = filtered.length;
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const books = filtered.slice(start, end);
-
-  return new Promise((resolve) =>
-    setTimeout(() => resolve({ books, total }), 300)
-  );
-};
-
-const sendExchangeRequest = async (
-  toEmail: string,
-  fromName: string,
-  fromEmail: string,
-  offeredBook: Book,
-  requestedBook: Book
-) => {
-  console.log("Відправка запиту на обмін:", {
-    toEmail,
-    fromName,
-    fromEmail,
-    offeredBook,
-    requestedBook,
-  });
-  return new Promise((res) => setTimeout(res, 500));
-};
 
 export function BooksPage() {
   const router = useRouter();
-  const [books, setBooks] = useState<Book[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<"asc" | "desc">("asc");
-  const [myBooks, setMyBooks] = useState<Book[]>([]);
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
-  const [sendingBookId, setSendingBookId] = useState<string | null>(null);
+  const {
+    books,
+    myBooks,
+    page,
+    setPage,
+    totalPages,
+    search,
+    setSearch,
+    sort,
+    setSort,
+  } = useBooksList();
 
-  const LIMIT = 10;
-  const totalPages = Math.ceil(total / LIMIT);
-
-  useEffect(() => {
-    fetchBooks(page, LIMIT, search, sort)
-      .then((data) => {
-        setBooks(data.books);
-        setTotal(data.total);
-
-        // Беремо книги поточного користувача
-        const mine = data.books.filter((b) => b.ownerId === currentUser.id);
-        setMyBooks(mine);
-      })
-      .catch(console.error);
-  }, [page, search, sort]);
-
-  const handleExchange = async (requestedBook: Book) => {
-    if (!selectedBookId) return alert("Оберіть книгу для обміну");
-    const offeredBook = myBooks.find((b) => b.id === selectedBookId);
-    if (!offeredBook) return;
-
-    setSendingBookId(requestedBook.id);
-    await sendExchangeRequest(
-      requestedBook.ownerId + "@example.com",
-      currentUser.name,
-      currentUser.email,
-      offeredBook,
-      requestedBook
-    );
-    setSendingBookId(null);
-    alert("Запит на обмін надіслано!");
-  };
+  const { selectedBookId, setSelectedBookId, sendingBookId, handleExchange } =
+    useBookExchange(myBooks);
 
   return (
     <div className="p-6">
@@ -135,10 +42,9 @@ export function BooksPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1"
         />
-
         <Select
           value={sort}
-          onValueChange={(value) => setSort(value as "asc" | "desc")}
+          onValueChange={(val) => setSort(val as "asc" | "desc")}
         >
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="Сортування" />
@@ -152,7 +58,7 @@ export function BooksPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {books.map((book) => {
-          const isOwner = book.ownerId === currentUser.id;
+          const isOwner = myBooks.some((b) => b.id === book.id);
           return (
             <Card
               key={book.id}
@@ -170,7 +76,7 @@ export function BooksPage() {
                   <>
                     <Select
                       value={selectedBookId || ""}
-                      onValueChange={(val) => setSelectedBookId(val)}
+                      onValueChange={setSelectedBookId}
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Оберіть вашу книгу для обміну" />

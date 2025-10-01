@@ -1,8 +1,8 @@
 "use client";
-
+import { InputHTMLAttributes } from "react";
 import { FieldError } from "react-hook-form";
 
-interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: FieldError;
 }
